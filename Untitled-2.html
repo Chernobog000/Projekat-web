@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Form</title>
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Bootstrap CSS library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+
+<!-- Include Bootstrap JS library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+
+</head>
+  <!-- basic styles  -->
+  <style>
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    
+    input, select {
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+      box-shadow: inset rgba(0,0,0,.1) .1em .1em .2em; 
+    }
+    
+    button[type=submit] {
+        background-color:#4CAF50;color:white;padding:.5rem;border:none;cursor:pointer;width:auto;display:block;margin-top:.8rem;font-size:.9rem;text-transform:uppercase;border-radius:.3rem
+     }
+
+     button[type=submit]:hover{
+       opacity:.7
+     }
+
+     p.error-message {
+       color:red;
+       font-weight:bold;
+
+     }
+     
+   </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1>User Authentication Example</h1>
+        <!-- egistration form name, email and password -->
+        <form id="registration-form" method="post">
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required/>
+
+        <label for ="email">Email:</label>
+        <input type = "email" id = "email" placeholder = "example@gmail.com"/>
+
+        <label for ="password">Password:</label>
+        <input type = "password" id = "password"/>
+
+        <label for ="confirm-password">Confirm Password:</label>  
+        <input type = "password"id ="confirm-password"/>   
+
+        <button type='submit'>Register!</button>
+
+        <p class='error-message'></p>   
+
+</form>
+<script type="text/javascript">
+
+    // Register new user
+    function registerUser(userData) {
+        $.ajax({
+          url: "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/korisnici/",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          data: JSON.stringify(userData),
+  
+          success: function(response) {
+            console.log("Registration successful!");
+            
+            // Display 
+            $("#message").text("Registration successful!").css({"color":"green"});
+            
+            // Redirect user 
+            window.location.replace("/login.html");
+          },
+  
+          error : function(xhr,status,error){
+              console.log(error);
+              
+              // Display error
+              $("#message").text("Error registering user!").css({"color":"red"});
+          }
+       });
+    }
+  
+    // Login user
+    function loginUser(userData) {
+        $.ajax({
+            url: "https://vsis.mef.edu.rs/projekat/ulaznice/public_html/api/korisnici/login",
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+                data : JSON.stringify({email : userData.email, password : userData.password}),
+            
+              success:function(data,status,xhr){
+                  console.log(data);
+                    
+                     // Store JWT token 
+                  localStorage.setItem('token',data.token);
+                
+                   // Redirect to dashboard 
+                   window.location="/dashboard.html";
+                 
+               },
+              error:function(xhr,status,error){
+                  console.log(error);
+  
+                  // Display error
+                  $("#message").text("Error logging in!").css({"color":"red"});
+              }
+         });
+    }
+  
+    // Logout user
+    function logoutUser() {
+      // Clear JWT token 
+      localStorage.removeItem("token");
+      
+      // Redirect user
+      window.location.replace("/login.html");
+    }
+    
+     $("#register-form").on("submit", function(event) {
+        event.preventDefault();
+  
+        var formData = {};
+        $(this).serializeArray().map(function(item){
+            formData[item.name] = item.value;
+        });
+  
+          registerUser(formData);
+        
+     });
+  
+     $("#login-form").on("submit",function(event){
+             event.preventDefault();
+         
+             var formData={};
+          $(this).serializeArray().map(function(item){
+              formData[item.name]=item.value;
+          }); 
+  
+            loginUser(formData);	
+          
+     });
+     
+     $('#logout-button').click(logoutUser);
+  
+  </script>
+  <!--  jQuery   JavaScript  -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="custom.js"></script>
+  
+
+</body>
+</html>
